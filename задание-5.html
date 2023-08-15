@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Запрос картинок</title>
+</head>
+<body>
+  <h2>Номер страницы</h2>
+  <input type="text" id="pageInput">
+  <h2>Лимит</h2>
+  <input type="text" id="limitInput">
+  <button onclick="makeRequest()">Запрос</button>
+  <div id="imageContainer"></div>
+
+  <script>
+    // Функция для выполнения запроса и вывода картинок
+    function makeRequest() {
+      var pageInput = document.getElementById('pageInput');
+      var limitInput = document.getElementById('limitInput');
+      var imageContainer = document.getElementById('imageContainer');
+
+      var page = parseInt(pageInput.value);
+      var limit = parseInt(limitInput.value);
+
+      // Проверка ввода
+      if (isNaN(page) || page < 1 || page > 10) {
+        imageContainer.innerHTML = 'Номер страницы вне диапазона от 1 до 10';
+      } else if (isNaN(limit) || limit < 1 || limit > 10) {
+        imageContainer.innerHTML = 'Лимит вне диапазона от 1 до 10';
+      } else {
+        // Выполнение запроса и вывод картинок
+        var url = 'https://picsum.photos/v2/list?page=' + page + '&limit=' + limit;
+        fetch(url)
+          .then(response => response.json())
+          .then(data => {
+            var images = '';
+            data.forEach(image => {
+              images += '<img src="' + image.download_url + '" width="200">';
+            });
+            imageContainer.innerHTML = images;
+
+            // Сохранение данных в localStorage
+            localStorage.setItem('lastRequest', JSON.stringify({
+              page: page,
+              limit: limit,
+              images: data
+            }));
+          })
+          .catch(error => {
+            console.error('Ошибка при выполнении запроса:', error);
+          });
+      }
+    }
+
+    // Проверка localStorage при загрузке страницы
+    window.onload = function() {
+      var lastRequest = localStorage.getItem('lastRequest');
+      if (lastRequest) {
+        var requestData = JSON.parse(lastRequest);
+        document.getElementById('pageInput').value = requestData.page;
+        document.getElementById('limitInput').value = requestData.limit;
+
+        var images = '';
+        requestData.images.forEach(image => {
+          images += '<img src="' + image.download_url + '" width="200">';
+        });
+        document.getElementById('imageContainer').innerHTML = images;
+      }
+    }
+  </script>
+</body>
+</html>

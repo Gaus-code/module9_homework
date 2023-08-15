@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fetch Image</title>
+</head>
+<body>
+    <input type="text" id="number1" placeholder="Enter number1">
+    <input type="text" id="number2" placeholder="Enter number2">
+    <button onclick="handleSubmit()">Submit</button>
+    <div id="imageContainer"></div>
+
+    <script>
+        function handleSubmit() {
+            const number1 = parseInt(document.getElementById('number1').value);
+            const number2 = parseInt(document.getElementById('number2').value);
+
+            if (isNaN(number1) || isNaN(number2) || number1 < 100 || number1 > 300 || number2 < 100 || number2 > 300) {
+                document.getElementById('imageContainer').innerHTML = "One of the numbers is outside the range from 100 to 300";
+            } else {
+                const url = `https://picsum.photos/${number1}/${number2}`;
+
+                fetch(url)
+                    .then(response => {
+                        const image = document.createElement('img');
+                        image.src = response.url;
+                        document.getElementById('imageContainer').appendChild(image);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        document.getElementById('imageContainer').innerHTML = "Failed to load image";
+                    });
+            }
+        }
+    </script>
+</body>
+</html>
